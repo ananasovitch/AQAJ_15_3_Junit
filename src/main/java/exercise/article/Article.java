@@ -9,7 +9,7 @@ public class Article {
     private String author;
     private LocalDate creationDate;
 
-    public Article(String title, String content, String author, LocalDate creationDate) {
+    public Article(String title, String content, String author, LocalDate i) {
         this.title = title;
         this.content = content;
         this.author = author;

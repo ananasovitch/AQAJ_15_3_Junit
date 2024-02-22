@@ -12,6 +12,7 @@ public class WorkerImpl implements Worker {
     private final Library library;
 
     public WorkerImpl(Library library) {
+
         this.library = library;
     }
 
@@ -35,18 +36,22 @@ public class WorkerImpl implements Worker {
 
     @Override
     public List<Article> prepareArticles(List<Article> articles) {
-        List<Article> result = articles
+        return articles
                 .stream()
                 .filter(this::isArticleCorrect)
+                .filter(this::isArticleNew)
+                .peek(this::prepareDate)
                 .toList();
-        result.forEach(this::prepareDate);
-        return result;
     }
 
     private boolean isArticleCorrect(Article article) {
         return !(nullOrBlank(article.getTitle()) ||
                 nullOrBlank(article.getContent()) ||
                 nullOrBlank(article.getAuthor()));
+    }
+
+    private boolean isArticleNew(Article article) {
+        return library.getAllTitles().stream().noneMatch(title -> title.equals(article.getTitle()));
     }
 
     private boolean nullOrBlank(String s) {
@@ -65,3 +70,4 @@ public class WorkerImpl implements Worker {
         }
     }
 }
+
