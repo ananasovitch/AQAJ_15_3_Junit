@@ -22,21 +22,21 @@ public class WorkerImplTest {
     private WorkerImpl worker;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
         worker = new WorkerImpl(mockLibrary);
     }
 
     @Test
     @DisplayName("При вызове метода addNewArticles с пустым списком статей ни одна статья не сохраняется в библиотеке")
-    void callingMethodWithEmptyListOfArticles() {
+    public void callingMethodWithEmptyListOfArticles() {
         worker.addNewArticles(new ArrayList<>());
         verify(mockLibrary, never()).store(anyInt(), anyList());
     }
 
     @Test
     @DisplayName("Повторное добавление статьи в библиотеку не приводит к ее дублированию")
-    void reAddedArticleToLibrary() {
+    public void reAddedArticleToLibrary() {
         List<Article> articles = new ArrayList<>();
         Article existingArticle = new Article("Existing Title", "Content", "Author", LocalDate.of(2024, 1, 1));
         articles.add(existingArticle);
@@ -47,7 +47,7 @@ public class WorkerImplTest {
 
     @Test
     @DisplayName("Если у статьи не указана дата создания, то метод prepareArticles устанавливает текущую дату")
-    void settinTheCurrentDateIfTheDateIsNotSet() {
+    public void settinTheCurrentDateIfTheDateIsNotSet() {
         List<Article> articles = new ArrayList<>();
         Article article = new Article("Title", "Content", "Author", null);
         articles.add(article);
@@ -57,7 +57,7 @@ public class WorkerImplTest {
 
     @Test
     @DisplayName("Нельзя повторно добавить в библиотеку уже существующую статью")
-    void cannotReAddAnArticleToTheLibrary() {
+    public void cannotReAddAnArticleToTheLibrary() {
         List<Article> articles = new ArrayList<>();
         Article existingArticle = new Article("Existing Title", "Content", "Author", LocalDate.of(2024, 1, 1));
         articles.add(existingArticle);
