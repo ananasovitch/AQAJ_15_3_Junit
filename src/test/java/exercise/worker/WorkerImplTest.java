@@ -3,7 +3,10 @@ package exercise.worker;
 import exercise.article.Article;
 import exercise.article.Library;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,22 +17,25 @@ import static org.mockito.Mockito.*;
 
 public class WorkerImplTest {
 
-    private WorkerImpl worker;
+    @Mock
     private Library mockLibrary;
+    private WorkerImpl worker;
 
     @BeforeEach
     void setUp() {
-        mockLibrary = mock(Library.class);
+        MockitoAnnotations.openMocks(this);
         worker = new WorkerImpl(mockLibrary);
     }
 
     @Test
+    @DisplayName("При вызове метода addNewArticles с пустым списком статей ни одна статья не сохраняется в библиотеке")
     void callingMethodWithEmptyListOfArticles() {
         worker.addNewArticles(new ArrayList<>());
         verify(mockLibrary, never()).store(anyInt(), anyList());
     }
 
     @Test
+    @DisplayName("Повторное добавление статьи в библиотеку не приводит к ее дублированию")
     void reAddedArticleToLibrary() {
         List<Article> articles = new ArrayList<>();
         Article existingArticle = new Article("Existing Title", "Content", "Author", LocalDate.of(2024, 1, 1));
@@ -39,7 +45,8 @@ public class WorkerImplTest {
         verify(mockLibrary, never()).store(anyInt(), anyList());
     }
 
-       @Test
+    @Test
+    @DisplayName("Если у статьи не указана дата создания, то метод prepareArticles устанавливает текущую дату")
     void settinTheCurrentDateIfTheDateIsNotSet() {
         List<Article> articles = new ArrayList<>();
         Article article = new Article("Title", "Content", "Author", null);
@@ -49,6 +56,7 @@ public class WorkerImplTest {
     }
 
     @Test
+    @DisplayName("Нельзя повторно добавить в библиотеку уже существующую статью")
     void cannotReAddAnArticleToTheLibrary() {
         List<Article> articles = new ArrayList<>();
         Article existingArticle = new Article("Existing Title", "Content", "Author", LocalDate.of(2024, 1, 1));
@@ -59,39 +67,28 @@ public class WorkerImplTest {
         verify(mockLibrary, never()).store(anyInt(), anyList());
     }
 
-
     @Test
+    @DisplayName("Статья с пустым заголовком не добавляется в список статей для обработки")
     public void anArticleWithAnEmptyTitleNotAddToTheList() {
-
-        WorkerImpl worker = new WorkerImpl(mockLibrary);
         Article article = new Article("", "Содержание", "Автор", LocalDate.now());
         List<Article> preparedArticles = worker.prepareArticles(List.of(article));
         assertTrue(preparedArticles.isEmpty());
     }
 
     @Test
+    @DisplayName("Статья с пустым содержанием не добавляется в список статей для обработки")
     public void anArticleWithEmptyContentNotAddToTheList() {
-       WorkerImpl worker = new WorkerImpl(mockLibrary);
-       Article article = new Article("Заголовок", "", "Автор", LocalDate.now());
-       List<Article> preparedArticles = worker.prepareArticles(List.of(article));
-       assertTrue(preparedArticles.isEmpty());
-    }
-
-    @Test
-    public void anArticleWithoutAnAuthorNotAddInTheList() {
-       WorkerImpl worker = new WorkerImpl(mockLibrary);
-       Article article = new Article("Заголовок", "Содержание", "", LocalDate.now());
-       List<Article> preparedArticles = worker.prepareArticles(List.of(article));
-       assertTrue(preparedArticles.isEmpty());
-    }
-
-    @Test
-    public void ArticlesSetsCurrentDate() {
-        WorkerImpl worker = new WorkerImpl(mockLibrary);
-        Article article = new Article("Заголовок", "Содержание", "Автор", null);
+        Article article = new Article("Заголовок", "", "Автор", LocalDate.now());
         List<Article> preparedArticles = worker.prepareArticles(List.of(article));
-        LocalDate currentDate = LocalDate.now();
-        LocalDate articleDate = preparedArticles.get(0).getCreationDate();
-        assertEquals(currentDate, articleDate);
+        assertTrue(preparedArticles.isEmpty());
     }
+
+    @Test
+    @DisplayName(" статья без указания автора не добавляется в список статей для обработки")
+    public void anArticleWithoutAnAuthorNotAddInTheList() {
+        Article article = new Article("Заголовок", "Содержание", "", LocalDate.now());
+        List<Article> preparedArticles = worker.prepareArticles(List.of(article));
+        assertTrue(preparedArticles.isEmpty());
+    }
+
 }
