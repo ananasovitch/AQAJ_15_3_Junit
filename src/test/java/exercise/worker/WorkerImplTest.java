@@ -22,9 +22,17 @@ public class WorkerImplTest {
     private WorkerImpl worker;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         MockitoAnnotations.openMocks(this);
         worker = new WorkerImpl(mockLibrary);
+    }
+    @Test
+    @DisplayName("Тест метода getCatalog")
+    public void testGetCatalog() {
+        when(mockLibrary.getAllTitles()).thenReturn(List.of("Статья 1", "Статья 2", "Статья 3"));
+        String catalog = worker.getCatalog();
+        String expectedCatalog = "Список доступных статей:\n    Статья 1\n    Статья 2\n    Статья 3\n";
+        assertEquals(expectedCatalog, catalog);
     }
 
     @Test
